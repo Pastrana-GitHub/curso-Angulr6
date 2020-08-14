@@ -1,9 +1,22 @@
+import {v4 as uuid} from 'uuid';
+import { ObjectUnsubscribedError } from 'rxjs';
 export class DestinoViaje{
-	nombre:string;
-	imagenUrl:string;
-
-	constructor(n:string, u:string){
-		this.nombre= n;
-		this.imagenUrl= u;
+	 selected : boolean;
+	 servicios: string[];
+	id = uuid();
+	constructor(public nombre: string, public u:string, public votes: number = 0){
+		this.servicios= ['pileta','desayuno'];
+	}	
+	 setSelected(s:boolean){
+		 this.selected = s; 
+	}
+	isSelected(){
+		return this.selected;
+	}
+	voteUp(){
+		this.votes++;
+	}
+	voteDown(){
+		this.votes--;
 	}
 }
