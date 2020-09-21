@@ -1,9 +1,11 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { DestinoViaje } from '../models/destino-viaje.models';
+import { Component, OnInit, Output, EventEmitter, Inject, forwardRef } from '@angular/core';
+import { DestinoViaje } from './../../models/destino-viaje.models';
 import { FormGroup, FormBuilder, Validators, FormControl, ValidatorFn } from '@angular/forms';
 import { fromEvent } from 'rxjs';
 import { map, filter,debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
+import { APP_CONFIG, AppConfig } from 'src/app/app.module';
+
 
 @Component({
   selector: 'app-form-destino-viaje',
@@ -17,7 +19,7 @@ export class FormDestinoViajeComponent implements OnInit {
   minLongNombre = 3;
   searchResults: string[];
 
-  constructor(fb: FormBuilder) {
+  constructor(fb: FormBuilder,@Inject(forwardRef(()=> APP_CONFIG)) private config: AppConfig ) {
     this.onItemAdded = new EventEmitter();
     this.fg = fb.group({
       nombre:['', Validators.compose([
@@ -30,19 +32,23 @@ export class FormDestinoViajeComponent implements OnInit {
     this.fg.valueChanges.subscribe((form:any)=>{
       console.log('cambio en el formulario: ', form);
     });
-   }
-   
+    this.fg.controls['nombre'].valueChanges.subscribe(
+      (value: string) =>{
+        console.log('nombre cambio: ', value);
+      }    
+    );
+   }   
+
   ngOnInit(): void {
     let elemNombre =<HTMLInputElement> document.getElementById('nombre');
-    fromEvent(elemNombre, 'input').pipe(
+    fromEvent(elemNombre, 'input')
+    .pipe(
       map((e:KeyboardEvent) => (e.target as HTMLInputElement).value),
       filter(text => text.length > 2),
-      debounceTime(200),
+      debounceTime(120),
       distinctUntilChanged(),
-      switchMap(()=> ajax('/assets/datos.json'))
-    ).subscribe(AjaxResponse => {
-      this.searchResults= AjaxResponse.response;
-    });
+      switchMap((text: string)=> ajax(this.config.apiEndpoint + '/ciudades?q=' + text))  //     (text: string)=> ajax(this.config.apiEndpoint + '/ciudades?q='+text))
+    ).subscribe(AjaxResponse => this.searchResults= AjaxResponse.response);
   }
   guardar(nombre:string, url:string): boolean{
     const d = new DestinoViaje(nombre,url);
