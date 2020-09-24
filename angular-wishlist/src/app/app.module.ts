@@ -8,6 +8,8 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { HttpClientModule, HttpHeaders, HttpRequest, HttpClient } from '@angular/common/http';
 import { Dexie } from 'dexie';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { NgxMapboxGLModule } from 'ngx-mapbox-gl';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { AppComponent } from './app.component';
 import { DestinoViajeComponent } from './components/destino-viaje/destino-viaje.component';
 import { ListaDestinosComponent } from './components/lista-destinos/lista-destinos.component';
@@ -29,6 +31,8 @@ import { createInjectionToken } from '@angular/compiler/src/core';
 import { async } from 'rxjs/internal/scheduler/async';
 import { DestinoViaje } from './models/destino-viaje.models';
 import { from, Observable } from 'rxjs';
+import { EspiameDirective } from './espiame.directive';
+import { TrackearClickDirective } from './trackear-click.directive';
 
 //app config
 export interface AppConfig {
@@ -166,7 +170,9 @@ function HttpLoadeFactory(http: HttpClient){
     VuelosComponentComponent,
     VuelosMainComponentComponent,
     VuelosMasInfoComponentComponent,
-    VuelosDetalleComponentComponent    
+    VuelosDetalleComponentComponent,
+    EspiameDirective,
+    TrackearClickDirective    
   ],
   imports: [
     BrowserModule,
@@ -184,7 +190,9 @@ function HttpLoadeFactory(http: HttpClient){
         useFactory: (HttpLoadeFactory),
         deps:[HttpClient]
       }
-    })
+    }),
+    NgxMapboxGLModule,
+    BrowserAnimationsModule
   ],
   providers: [      
     AuthService, UsuarioLogueadoGuard,
